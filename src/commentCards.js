@@ -13,8 +13,13 @@ var CommentCard = (function () {
     }
     CommentCard.prototype.like = function () {
         if (!this.isLiked) {
-            this.point += 1;
-            this.isLiked = true;
+            if (this.isDisliked) {
+                this.point += 1;
+            }
+            else {
+                this.point += 1;
+                this.isLiked = true;
+            }
             this.isDisliked = false;
             return;
         }
@@ -22,12 +27,20 @@ var CommentCard = (function () {
     };
     CommentCard.prototype.dislike = function () {
         if (!this.isDisliked) {
-            this.point -= 1;
-            this.isDisliked = true;
+            if (this.isLiked) {
+                this.point -= 1;
+            }
+            else {
+                this.point -= 1;
+                this.isDisliked = true;
+            }
             this.isLiked = false;
             return;
         }
         alert("You already disliked it");
+    };
+    CommentCard.prototype.removeComment = function (commentsArray, comment) {
+        commentsArray.splice(commentsArray.indexOf(comment), 1);
     };
     return CommentCard;
 }());
@@ -58,6 +71,12 @@ var ElementBuilder = (function () {
         parent.appendChild(this.parentElement);
         return this;
     };
+    ElementBuilder.prototype.deleteElement = function () {
+        this.parentElement.style.display = 'none';
+    };
+    ElementBuilder.prototype.addClickListener = function (fn) {
+        this.parentElement.addEventListener("click", fn);
+    };
     ElementBuilder.prototype.returnElement = function () {
         return this.parentElement;
     };
@@ -67,12 +86,12 @@ var App = (function () {
     function App() {
     }
     App.init = function (commentsArray, rootElement) {
-        var functionalCommentsArray = commentsArray.map(function (comment) {
-            var id = comment.id, text = comment.text, userName = comment.userName, imageUrl = comment.imageUrl, date = comment.date, point = comment.point;
+        var functionalCommentsArray = commentsArray.map(function (_a) {
+            var id = _a.id, text = _a.text, userName = _a.userName, imageUrl = _a.imageUrl, date = _a.date, point = _a.point;
             var commentObject = new CommentCard(id, text, userName, imageUrl, date, point, false, false);
             return commentObject;
         });
-        functionalCommentsArray.forEach(function (functionalComment) {
+        function elementPainter(functionalComment) {
             var id = functionalComment.id, text = functionalComment.text, userName = functionalComment.userName, imageUrl = functionalComment.imageUrl, date = functionalComment.date, point = functionalComment.point;
             var commentContainer = builder.create('div')
                 .setStyle(App.styles.commentContainer)
@@ -130,6 +149,31 @@ var App = (function () {
                 .setStyle(App.styles.date)
                 .setText(date)
                 .appendTo(commentContainer);
+            builder.create('span')
+                .setStyle(App.styles.closeButton)
+                .setText("❌")
+                .appendTo(commentContainer)
+                .returnElement()
+                .addEventListener("click", function () {
+                functionalComment.removeComment(functionalCommentsArray, functionalComment);
+                rootElement.removeChild(commentContainer);
+            });
+        }
+        functionalCommentsArray.forEach(function (functionalComment) {
+            elementPainter(functionalComment);
+        });
+        var addbutton = builder.create('button')
+            .setStyle(App.styles.addbutton)
+            .setText("+")
+            .appendTo(rootElement)
+            .returnElement();
+        addbutton.addEventListener("click", function () {
+            functionalCommentsArray.push(new CommentCard('4', "Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim blanditiis iste minus accusamus dolore", "Masoud", "https://media-cdn.tripadvisor.com/media/photo-l/09/e4/1d/3b/glenview-folk-museum.jpg", "February 2021", 24, false, false));
+            addbutton.style.display = "none";
+            rootElement.innerHTML = '';
+            functionalCommentsArray.forEach(function (functionalComment) {
+                elementPainter(functionalComment);
+            });
         });
     };
     App.styles = {
@@ -142,7 +186,9 @@ var App = (function () {
         like: "\n      cursor: pointer;\n      margin: 0 5px;\n    ",
         dislike: "\n      cursor: pointer;\n      margin: 0 5px;\n    ",
         commentText: "\n    ",
-        date: "\n    align-self: flex-end\n    "
+        date: "\n      align-self: flex-end\n    ",
+        closeButton: "\n      align-self: flex-start;\n      cursor: pointer\n    ",
+        addbutton: "\n      background-color: #64e764;\n      border-radius: 50%;\n      width: 40px;\n      height: 40px;\n      font-size: 1.2rem;\n      cursor: pointer;\n      outline: none;\n      border: none;\n      margin: 5px 10px 40px 10px;\n      box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.1)\n    ",
     };
     return App;
 }());

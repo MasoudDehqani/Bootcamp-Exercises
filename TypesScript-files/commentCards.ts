@@ -36,8 +36,12 @@ class CommentCard implements CommentsType {
 
   like(this: CommentCard) {
     if (!this.isLiked) {
-      this.point += 1
-      this.isLiked = true
+      if (this.isDisliked) {
+        this.point += 1
+      } else {
+        this.point += 1
+        this.isLiked = true
+      }      
       this.isDisliked = false
       return
     }
@@ -46,12 +50,20 @@ class CommentCard implements CommentsType {
 
   dislike(this: CommentCard) {
     if (!this.isDisliked) {
-      this.point -= 1
-      this.isDisliked = true
+      if (this.isLiked) {
+        this.point -= 1
+      } else {
+        this.point -= 1
+        this.isDisliked = true
+      }      
       this.isLiked = false
       return
     }
     alert("You already disliked it")
+  }
+
+  removeComment(this: CommentCard, commentsArray: CommentsType[], comment: CommentsType) {
+    commentsArray.splice(commentsArray.indexOf(comment), 1)
   }
 }
 
@@ -86,6 +98,14 @@ class ElementBuilder {
   appendTo(this: ElementBuilder, parent: HTMLElement) {
     parent.appendChild(this.parentElement)
     return this
+  }
+
+  deleteElement() {
+    this.parentElement.style.display = 'none'
+  }
+
+  addClickListener(fn: () => void) {
+    this.parentElement.addEventListener("click", fn)
   }
 
   // static likeDislikeclickHandler(like: HTMLElement, point: number, dislike: HTMLElement, totalPoints: any) {
@@ -182,19 +202,36 @@ class App {
     `,
 
     date: `
-    align-self: flex-end
-    `
+      align-self: flex-end
+    `,
+
+    closeButton: `
+      align-self: flex-start;
+      cursor: pointer
+    `,
+
+    addbutton: `
+      background-color: #64e764;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      outline: none;
+      border: none;
+      margin: 5px 10px 40px 10px;
+      box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.1)
+    `,
   };
 
   static init(commentsArray: CommentsType[], rootElement: HTMLElement) {
 
-    const functionalCommentsArray = commentsArray.map( comment => {
-      let {id, text, userName, imageUrl, date, point} = comment
+    const functionalCommentsArray = commentsArray.map( ({id, text, userName, imageUrl, date, point}) => {
       let commentObject = new CommentCard(id, text, userName, imageUrl, date, point, false, false)
       return commentObject
     })
 
-    functionalCommentsArray.forEach( functionalComment => {
+    function elementPainter(functionalComment: CommentCard) {
       let {id, text, userName, imageUrl, date, point} = functionalComment
 
       const commentContainer = builder.create('div')
@@ -263,7 +300,48 @@ class App {
       builder.create('span')
         .setStyle(App.styles.date)
         .setText(date)
+        .appendTo(commentContainer);
+
+      builder.create('span')
+        .setStyle(App.styles.closeButton)
+        .setText("❌")
         .appendTo(commentContainer)
+        .returnElement()
+        .addEventListener("click", () => {
+          functionalComment.removeComment(functionalCommentsArray, functionalComment)
+          rootElement.removeChild(commentContainer)
+        })
+    }
+
+    functionalCommentsArray.forEach((functionalComment) => {
+      elementPainter(functionalComment)
+    })
+
+    const addbutton = builder.create('button')
+      .setStyle(App.styles.addbutton)
+      .setText("+")
+      .appendTo(rootElement)
+      .returnElement()
+      
+    addbutton.addEventListener("click" ,() => {
+      functionalCommentsArray.push(new CommentCard(
+        '4', 
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim blanditiis iste minus accusamus dolore", 
+        "Masoud",
+        "https://media-cdn.tripadvisor.com/media/photo-l/09/e4/1d/3b/glenview-folk-museum.jpg",
+        "February 2021",
+        24,
+        false,
+        false
+      ))
+      // addbutton.deleteElement()
+      addbutton.style.display = "none"
+      rootElement.innerHTML = ''
+      functionalCommentsArray.forEach((functionalComment) => {
+        elementPainter(functionalComment)
+      })
+      // this.init(functionalCommentsArray, rootElement)
+      // addbutton.style.display = 'none'
     })
   }
 }
