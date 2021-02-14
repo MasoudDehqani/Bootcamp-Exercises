@@ -1,7 +1,6 @@
-"use strict";
-var rootElement = document.querySelector("#root");
-var CommentCard = (function () {
-    function CommentCard(id, text, userName, imageUrl, date, point, isLiked, isDisliked) {
+export const rootElement = document.querySelector("#root");
+class CommentCard {
+    constructor(id, text, userName, imageUrl, date, point, isLiked, isDisliked) {
         this.id = id;
         this.text = text;
         this.userName = userName;
@@ -11,7 +10,7 @@ var CommentCard = (function () {
         this.isLiked = isLiked;
         this.isDisliked = isDisliked;
     }
-    CommentCard.prototype.like = function () {
+    like() {
         if (!this.isLiked) {
             if (this.isDisliked) {
                 this.point += 1;
@@ -24,8 +23,8 @@ var CommentCard = (function () {
             return;
         }
         alert("You already liked it");
-    };
-    CommentCard.prototype.dislike = function () {
+    }
+    dislike() {
         if (!this.isDisliked) {
             if (this.isLiked) {
                 this.point -= 1;
@@ -38,70 +37,74 @@ var CommentCard = (function () {
             return;
         }
         alert("You already disliked it");
-    };
-    CommentCard.prototype.removeComment = function (commentsArray, comment) {
+    }
+    removeComment(commentsArray, comment) {
         commentsArray.splice(commentsArray.indexOf(comment), 1);
-    };
-    return CommentCard;
-}());
-var builder = {
-    create: function (elementName) {
-        var elemet = document.createElement(elementName);
+    }
+}
+export const builder = {
+    create(elementName) {
+        const elemet = document.createElement(elementName);
         return new ElementBuilder(elemet);
     }
 };
-var ElementBuilder = (function () {
-    function ElementBuilder(parentElement) {
+class ElementBuilder {
+    constructor(parentElement) {
         this.parentElement = parentElement;
         this.parentElement = parentElement;
     }
-    ElementBuilder.prototype.setStyle = function (styles) {
+    setStyle(styles) {
         this.parentElement.style.cssText = styles;
         return this;
-    };
-    ElementBuilder.prototype.setText = function (text) {
+    }
+    setText(text) {
         this.parentElement.textContent = text;
         return this;
-    };
-    ElementBuilder.prototype.setBackgroundImage = function (image) {
-        this.parentElement.style.backgroundImage = "url(" + image + ")";
+    }
+    setType(type) {
+        this.parentElement.setAttribute("type", type);
         return this;
-    };
-    ElementBuilder.prototype.appendTo = function (parent) {
+    }
+    setPlaceholder(placeholder) {
+        this.parentElement.setAttribute("placeholder", placeholder);
+        return this;
+    }
+    setBackgroundImage(image) {
+        this.parentElement.style.backgroundImage = `url(${image})`;
+        return this;
+    }
+    appendTo(parent) {
         parent.appendChild(this.parentElement);
         return this;
-    };
-    ElementBuilder.prototype.deleteElement = function () {
-        this.parentElement.style.display = 'none';
-    };
-    ElementBuilder.prototype.addClickListener = function (fn) {
-        this.parentElement.addEventListener("click", fn);
-    };
-    ElementBuilder.prototype.returnElement = function () {
-        return this.parentElement;
-    };
-    return ElementBuilder;
-}());
-var App = (function () {
-    function App() {
     }
-    App.init = function (commentsArray, rootElement) {
-        var functionalCommentsArray = commentsArray.map(function (_a) {
-            var id = _a.id, text = _a.text, userName = _a.userName, imageUrl = _a.imageUrl, date = _a.date, point = _a.point;
-            var commentObject = new CommentCard(id, text, userName, imageUrl, date, point, false, false);
+    deleteElement() {
+        this.parentElement.style.display = 'none';
+    }
+    addClickListener(fn) {
+        this.parentElement.addEventListener("click", fn);
+        return this;
+    }
+    returnElement() {
+        return this.parentElement;
+    }
+}
+class App {
+    static init(commentsArray, rootElement) {
+        const functionalCommentsArray = commentsArray.map(({ id, text, userName, imageUrl, date, point }) => {
+            let commentObject = new CommentCard(id, text, userName, imageUrl, date, point, false, false);
             return commentObject;
         });
         function elementPainter(functionalComment) {
-            var id = functionalComment.id, text = functionalComment.text, userName = functionalComment.userName, imageUrl = functionalComment.imageUrl, date = functionalComment.date, point = functionalComment.point;
-            var commentContainer = builder.create('div')
+            let { id, text, userName, imageUrl, date, point } = functionalComment;
+            const commentContainer = builder.create('div')
                 .setStyle(App.styles.commentContainer)
                 .appendTo(rootElement)
                 .returnElement();
-            var headSection = builder.create('div')
+            const headSection = builder.create('div')
                 .setStyle(App.styles.headSection)
                 .appendTo(commentContainer)
                 .returnElement();
-            var avatarUserName = builder.create('div')
+            const avatarUserName = builder.create('div')
                 .setStyle(App.styles.avatarUserName)
                 .appendTo(headSection)
                 .returnElement();
@@ -109,37 +112,37 @@ var App = (function () {
                 .setStyle(App.styles.avatar)
                 .setBackgroundImage(imageUrl)
                 .appendTo(avatarUserName);
-            var u = builder.create('span')
-                .setText("" + userName)
+            const u = builder.create('span')
+                .setText(`${userName}`)
                 .setStyle(App.styles.userName)
                 .appendTo(avatarUserName);
-            var likeDislikePoint = builder.create('div')
+            const likeDislikePoint = builder.create('div')
                 .setStyle(App.styles.likeDislikePoint)
                 .appendTo(headSection)
                 .returnElement();
-            var totalPoints = builder.create('span')
-                .setText("Total Points: " + point)
+            const totalPoints = builder.create('span')
+                .setText(`Total Points: ${point}`)
                 .appendTo(likeDislikePoint);
-            var like = builder.create('span')
+            const like = builder.create('span')
                 .setStyle(App.styles.likeDislikePoint)
                 .setText("👍")
                 .setStyle(App.styles.like)
                 .appendTo(likeDislikePoint)
                 .returnElement()
-                .addEventListener('click', function () {
+                .addEventListener('click', () => {
                 functionalComment.like();
-                totalPoints.setText("Total Points: " + functionalComment.point);
+                totalPoints.setText(`Total Points: ${functionalComment.point}`);
             });
             ;
-            var dislike = builder.create('span')
+            const dislike = builder.create('span')
                 .setStyle(App.styles.likeDislikePoint)
                 .setText("👎")
                 .setStyle(App.styles.dislike)
                 .appendTo(likeDislikePoint)
                 .returnElement()
-                .addEventListener('click', function () {
+                .addEventListener('click', () => {
                 functionalComment.dislike();
-                totalPoints.setText("Total Points: " + functionalComment.point);
+                totalPoints.setText(`Total Points: ${functionalComment.point}`);
             });
             builder.create("p")
                 .setStyle(App.styles.commentText)
@@ -154,45 +157,95 @@ var App = (function () {
                 .setText("❌")
                 .appendTo(commentContainer)
                 .returnElement()
-                .addEventListener("click", function () {
+                .addEventListener("click", () => {
                 functionalComment.removeComment(functionalCommentsArray, functionalComment);
                 rootElement.removeChild(commentContainer);
             });
         }
-        functionalCommentsArray.forEach(function (functionalComment) {
+        functionalCommentsArray.forEach((functionalComment) => {
             elementPainter(functionalComment);
         });
-        var addbutton = builder.create('button')
+        const addbutton = builder.create('button')
             .setStyle(App.styles.addbutton)
             .setText("+")
             .appendTo(rootElement)
             .returnElement();
-        addbutton.addEventListener("click", function () {
+        addbutton.addEventListener("click", () => {
             functionalCommentsArray.push(new CommentCard('4', "Lorem ipsum dolor sit amet consectetur adipisicing elit. Enim blanditiis iste minus accusamus dolore", "Masoud", "https://media-cdn.tripadvisor.com/media/photo-l/09/e4/1d/3b/glenview-folk-museum.jpg", "February 2021", 24, false, false));
             addbutton.style.display = "none";
             rootElement.innerHTML = '';
-            functionalCommentsArray.forEach(function (functionalComment) {
+            functionalCommentsArray.forEach((functionalComment) => {
                 elementPainter(functionalComment);
             });
         });
-    };
-    App.styles = {
-        commentContainer: "\n      display: flex;\n      flex-direction: column;\n      margin: 20px 5px;\n      font-size: 14px;\n      padding: 10px;\n      box-shadow: 1px 1px 10px 1px rgba(0,0,0,0.2);\n      border-radius: 10px;\n      font-family: sans-serif",
-        headSection: "\n      display: flex;\n      justify-content: space-between;\n      align-items: center\n    ",
-        avatar: "\n      width: 60px;\n      height: 60px;\n      border-radius: 50px;\n      background-size: cover;\n      margin-right: 10px;\n      vertical-align: middle\n    ",
-        userName: "\n      line-height: 60px\n    ",
-        avatarUserName: "\n      display: flex;\n      justify-content: space-between;\n      font-weight: bold\n    ",
-        likeDislikePoint: "\n      font-weight: bold;\n      user-select: none\n    ",
-        like: "\n      cursor: pointer;\n      margin: 0 5px;\n    ",
-        dislike: "\n      cursor: pointer;\n      margin: 0 5px;\n    ",
-        commentText: "\n    ",
-        date: "\n      align-self: flex-end\n    ",
-        closeButton: "\n      align-self: flex-start;\n      cursor: pointer\n    ",
-        addbutton: "\n      background-color: #64e764;\n      border-radius: 50%;\n      width: 40px;\n      height: 40px;\n      font-size: 1.2rem;\n      cursor: pointer;\n      outline: none;\n      border: none;\n      margin: 5px 10px 40px 10px;\n      box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.1)\n    ",
-    };
-    return App;
-}());
-var comments = [
+    }
+}
+App.styles = {
+    commentContainer: `
+      display: flex;
+      flex-direction: column;
+      margin: 20px 5px;
+      font-size: 14px;
+      padding: 10px;
+      box-shadow: 1px 1px 10px 1px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      font-family: sans-serif`,
+    headSection: `
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    `,
+    avatar: `
+      width: 60px;
+      height: 60px;
+      border-radius: 50px;
+      background-size: cover;
+      margin-right: 10px;
+      vertical-align: middle
+    `,
+    userName: `
+      line-height: 60px
+    `,
+    avatarUserName: `
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold
+    `,
+    likeDislikePoint: `
+      font-weight: bold;
+      user-select: none
+    `,
+    like: `
+      cursor: pointer;
+      margin: 0 5px;
+    `,
+    dislike: `
+      cursor: pointer;
+      margin: 0 5px;
+    `,
+    commentText: `
+    `,
+    date: `
+      align-self: flex-end
+    `,
+    closeButton: `
+      align-self: flex-start;
+      cursor: pointer
+    `,
+    addbutton: `
+      background-color: #64e764;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      outline: none;
+      border: none;
+      margin: 5px 10px 40px 10px;
+      box-shadow: 1px 1px 5px 1px rgba(0,0,0,0.1)
+    `,
+};
+const comments = [
     {
         id: "1",
         text: "Great welcoming experience to the Dominican. We used Otium for the airport transport- we were to the resort in 20 minutes. Ralphy has been our concierge for the first half of the stay, he been very helpful- always able to pull through for anything we request",

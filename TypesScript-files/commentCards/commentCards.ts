@@ -1,4 +1,4 @@
-const rootElement = document.querySelector("#root")! as HTMLDivElement;
+export const rootElement = document.querySelector("#root")! as HTMLDivElement;
 
 interface CommentsType {
   id: string;
@@ -67,7 +67,7 @@ class CommentCard implements CommentsType {
   }
 }
 
-const builder = {
+export const builder = {
   create(elementName: string) {
     const elemet = document.createElement(elementName)
     return new ElementBuilder(elemet)
@@ -90,6 +90,16 @@ class ElementBuilder {
     return this
   }
 
+  setType(this: ElementBuilder, type: string) {
+    this.parentElement.setAttribute("type", type)
+    return this
+  }
+
+  setPlaceholder(placeholder: string) {
+    this.parentElement.setAttribute("placeholder", placeholder)
+    return this
+  }
+
   setBackgroundImage(image: string) {
     this.parentElement.style.backgroundImage = `url(${image})`
     return this
@@ -106,6 +116,7 @@ class ElementBuilder {
 
   addClickListener(fn: () => void) {
     this.parentElement.addEventListener("click", fn)
+    return this
   }
 
   // static likeDislikeclickHandler(like: HTMLElement, point: number, dislike: HTMLElement, totalPoints: any) {
