@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="react.development.js"></script>
+    <script src="react-dom.development.js"></script>
+    <script src="babel.min.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const comments = [
+        {
+          id: "1",
+          text:
+            "Great welcoming experience to the Dominican. We used Otium for the airport transport- we were to the resort in 20 minutes. Ralphy has been our concierge for the first half of the stay, he been very helpful- always able to pull through for anything we request",
+          userName: "Jake W",
+          imageUrl:
+            "https://media-cdn.tripadvisor.com/media/photo-l/01/2e/70/9e/avatar069.jpg",
+          date: "January 2020",
+          point: 11,
+        },
+        {
+          id: "2",
+          text:
+            "We travelled as a group of 13 ages 18 to 80 and this resort was enjoyed by all. We’ve been fortunate to travel to many resorts in Punta Cana but the Grand was by far the best",
+          userName: "Andrea C",
+          imageUrl:
+            "https://media-cdn.tripadvisor.com/media/photo-l/01/2e/70/55/avatar028.jpg",
+          date: "Jan 2020",
+          point: 14,
+        },
+        {
+          id: "3",
+          text:
+            "The Hotel opened 1-1,5 hs ago. Everything is new and very clean. Even the cheapest rooms are very spacious (77square meters and room and dinning area with sofa bed are diivided by a sliding door).",
+          userName: "sergiogiaco",
+          imageUrl:
+            "https://media-cdn.tripadvisor.com/media/photo-l/01/2e/70/74/avatar056.jpg",
+          date: "Dec 2020",
+          point: 11,
+        },
+      ];
+        
+      const styles = {
+        comment: {
+          display: "flex",
+          flexDirection: "column",
+          padding: "10px",
+          boxShadow: "1px 1px 10px 1px rgba(0,0,0,0.2)",
+          borderRadius: "8px",
+          marginBottom: "10px",
+          fontFamily: "sans-serif"
+        },
+        avatarAndName: {
+          // backgroundImage: `url(${imageUrl})`,
+          borderRadius: "50px",
+          display: "inline-block",
+          width: "60px",
+          height: "60px",
+          backgroundSize: "cover",
+          verticalAlign: "middle",
+          marginRight: "10px"
+        },
+        commentText: {
+          alignSelf: "center"
+        },
+        commentDate: {
+          alignSelf: "flex-end"
+        }
+      }
+
+      class AvatarAndName extends React.Component {
+        render() {
+          return (
+            <div>
+              <span style={{backgroundImage: `url(${this.props.image})`, ...styles.avatarAndName}}></span>             
+              <span style={{verticalAlign: "middle"}}>{this.props.userName}</span>              
+            </div>
+          )
+        }
+      }
+
+      function AvatarAndNameF({image, userName}) {
+        return (
+            <div>
+              <span style={{backgroundImage: `url(${image})`, ...styles.avatarAndName}}></span>             
+              <span style={{verticalAlign: "middle"}}>{userName}</span>              
+            </div>
+        )        
+      }
+
+      class CommentTextAndDate extends React.Component {
+        render() {
+          return (
+            <>
+              <p>{this.props.text}</p>
+              <span style={this.props.style}>{this.props.date}</span>
+            </>
+          )
+        }
+      }
+
+      function CommentTextAndDateF({text, style, date}) {
+        return (
+            <>
+              <p style={styles.commentText}>{text}</p>
+              <span style={style}>{date}</span>
+            </>
+        )        
+      }
+
+      class Comment extends React.Component {
+        render() {
+          let comment = comments.map( (item, index) => {
+            return (
+              <div key={index} style={styles.comment}>
+                <AvatarAndName image={item.imageUrl} userName={item.userName} />
+                <CommentTextAndDate style={styles.commentDate} text={item.text} date={item.date} />
+              </div>
+            )
+          })
+
+          return comment
+        }
+      }
+
+      function CommentF() {
+        let comment = comments.map( (item, index) => {
+          return (
+            <div key={index} style={styles.comment}>
+              <AvatarAndNameF image={item.imageUrl} userName={item.userName} />
+              <CommentTextAndDateF style={styles.commentDate} text={item.text} date={item.date} />
+            </div>
+          )
+        })
+
+        return comment
+      }
+
+      class App extends React.Component {
+        render() {
+          return (
+            <Comment />
+          )
+        }
+      }
+
+      function AppF() {
+        return <CommentF />
+      }
+
+      ReactDOM.render(
+        <AppF />,
+        document.querySelector("#root")
+      );
+    </script>
+  </body>
+</html>
