@@ -91,7 +91,7 @@ const [recordsContainer, mainInput, loadButton]: [HTMLElement, HTMLInputElement,
 
 async function getPhotos() {
   let responsePromise = await fetch("https://jsonplaceholder.typicode.com/photos")
-  if (!responsePromise.ok) throw new Error("Something goes wrong")
+  if (!responsePromise.ok) throw new Error("Requested page not found")
   let response = await responsePromise.json()
 
   loadButton.addEventListener("click", () => {
@@ -115,4 +115,4 @@ async function getPhotos() {
   })
 }
 
-getPhotos().catch( e => alert("An error occured, please refresh the page"))
+getPhotos().catch( e => alert(e.message))

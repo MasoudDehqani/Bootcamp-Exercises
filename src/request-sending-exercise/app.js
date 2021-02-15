@@ -90,7 +90,7 @@ function getPhotos() {
     return __awaiter(this, void 0, void 0, function* () {
         let responsePromise = yield fetch("https://jsonplaceholder.typicode.com/photos");
         if (!responsePromise.ok)
-            throw new Error("Something goes wrong");
+            throw new Error("Requested page not found");
         let response = yield responsePromise.json();
         loadButton.addEventListener("click", () => {
             console.log(+mainInput.value);
@@ -111,5 +111,5 @@ function getPhotos() {
         });
     });
 }
-getPhotos().catch(e => alert("An error occured, please refresh the page"));
+getPhotos().catch(e => alert(e.message));
 //# sourceMappingURL=app.js.map
