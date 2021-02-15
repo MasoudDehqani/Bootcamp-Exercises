@@ -87,10 +87,12 @@ function render(): [HTMLElement, HTMLInputElement, HTMLElement] {
   return [recordsContainer, mainInput, loadButton]
 }
 
-async function getPhotos() {
-  let response = await (await fetch("https://jsonplaceholder.typicode.com/photos")).json()
+const [recordsContainer, mainInput, loadButton]: [HTMLElement, HTMLInputElement, HTMLElement] = render()
 
-  const [recordsContainer, mainInput, loadButton]: [HTMLElement, HTMLInputElement, HTMLElement] = render()
+async function getPhotos() {
+  let responsePromise = await fetch("https://jsonplaceholder.typicode.com/photos")
+  if (!responsePromise.ok) throw new Error("Something goes wrong")
+  let response = await responsePromise.json()
 
   loadButton.addEventListener("click", () => {
     console.log(+mainInput.value)
@@ -113,4 +115,4 @@ async function getPhotos() {
   })
 }
 
-getPhotos()
+getPhotos().catch( e => alert("An error occured, please refresh the page"))
